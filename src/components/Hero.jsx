@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
-import mee from '../assets/mee.png'
+import mee from '../assets/noura.jpg'
 import Icon from './Icon'
 
 const roles = ['React.js', 'Laravel', 'PHP', 'REST APIs']
@@ -85,7 +85,7 @@ export default function Hero() {
         >
           <motion.div className="photo-ring" animate={reduce ? undefined : { rotate: 360 }} transition={{ duration: 40, repeat: Infinity, ease: 'linear' }} aria-hidden="true" />
           <motion.div className="photo-frame" animate={reduce ? undefined : { y: [0, -10, 0] }} transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}>
-            <img src={mee} alt="Noura Mohamed" width="460" height="628" />
+            <img src={mee} alt="Noura Mohamed" width="920" height="1256" />
           </motion.div>
           <motion.div className="chip chip-a" animate={reduce ? undefined : { y: [0, -8, 0] }} transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}>React.js</motion.div>
           <motion.div className="chip chip-b" animate={reduce ? undefined : { y: [0, 8, 0] }} transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}>Laravel</motion.div>
