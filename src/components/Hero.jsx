@@ -1,110 +1,96 @@
-import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
+import { useEffect, useState } from 'react'
+import { motion, useReducedMotion } from 'framer-motion'
 import mee from '../assets/mee.png'
+import Icon from './Icon'
 
-const titles = ['React Developer', 'Laravel Developer', 'Full Stack Developer']
+const roles = ['React.js', 'Laravel', 'PHP', 'REST APIs']
+const ease = [0.16, 1, 0.3, 1]
 
-export default function Hero() {
-  const [titleIndex, setTitleIndex] = useState(0)
-  const [displayText, setDisplayText] = useState('')
-  const [isDeleting, setIsDeleting] = useState(false)
+function Typing() {
+  const reduce = useReducedMotion()
+  const [i, setI] = useState(0)
+  const [text, setText] = useState(reduce ? roles[0] : '')
+  const [del, setDel] = useState(false)
 
   useEffect(() => {
-    const currentTitle = titles[titleIndex]
-    let timer
-
-    if (isDeleting) {
-      timer = setTimeout(() => {
-        setDisplayText(currentTitle.slice(0, displayText.length - 1))
-        if (displayText.length === 1) {
-          setIsDeleting(false)
-          setTitleIndex((prev) => (prev + 1) % titles.length)
+    if (reduce) return
+    const word = roles[i]
+    const t = setTimeout(
+      () => {
+        if (!del) {
+          setText(word.slice(0, text.length + 1))
+          if (text.length + 1 === word.length) setTimeout(() => setDel(true), 1400)
+        } else {
+          setText(word.slice(0, text.length - 1))
+          if (text.length - 1 === 0) { setDel(false); setI((i + 1) % roles.length) }
         }
-      }, 50)
-    } else {
-      timer = setTimeout(() => {
-        setDisplayText(currentTitle.slice(0, displayText.length + 1))
-        if (displayText.length === currentTitle.length - 1) {
-          setTimeout(() => setIsDeleting(true), 2000)
-        }
-      }, 100)
-    }
-
-    return () => clearTimeout(timer)
-  }, [displayText, isDeleting, titleIndex])
+      },
+      del ? 45 : 90
+    )
+    return () => clearTimeout(t)
+  }, [text, del, i, reduce])
 
   return (
-    <header className="hero-section">
-      <div className="position-absolute top-0 end-0 w-50 h-100 dot-grid" style={{ zIndex: 0, pointerEvents: 'none' }} />
-      <div className="warm-glow position-absolute inset-0 w-100 h-100" style={{ zIndex: 0, pointerEvents: 'none' }} />
+    <span className="typing">
+      {text}
+      <span className="caret" aria-hidden="true" />
+    </span>
+  )
+}
 
-      <div className="container-xl position-relative" style={{ zIndex: 1 }}>
-        <div className="row align-items-center g-5">
-          <motion.div className="col-md-5 order-md-1 order-2"
-            initial={{ opacity: 0, x: -60 }} animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}>
-            <div className="portrait-wrap">
-              <div className="portrait-glow" />
-              <div className="portrait-border">
-                <img className="portrait-img"
-                  src={mee}
-                   alt="Noura Mohamed - Web Developer" />
-              </div>
-            </div>
+export default function Hero() {
+  const reduce = useReducedMotion()
+  const item = (d) => ({
+    initial: reduce ? false : { opacity: 0, y: 26 },
+    animate: { opacity: 1, y: 0 },
+    transition: { duration: 0.8, delay: d, ease },
+  })
+  return (
+    <section id="top" className="hero">
+      <div className="blob blob-a" aria-hidden="true" />
+      <div className="blob blob-b" aria-hidden="true" />
+      <div className="container hero-grid">
+        <div className="hero-copy">
+          <motion.p className="eyebrow" {...item(0.05)}>
+            <span className="dot" /> Full Stack Developer
+          </motion.p>
+          <motion.h1 {...item(0.15)}>
+            Hi, I'm <span className="grad">Noura Mohamed</span>
+          </motion.h1>
+          <motion.p className="hero-line" {...item(0.28)}>
+            I build web apps with <Typing />
+          </motion.p>
+          <motion.p className="hero-sub" {...item(0.4)}>
+            Information Systems graduate from Zagazig University, based in Zagazig, Egypt. I work on both the frontend and the backend.
+          </motion.p>
+          <motion.div className="hero-actions" {...item(0.52)}>
+            <a href="#projects" className="btn btn-primary" onClick={(e) => { e.preventDefault(); document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' }) }}>
+              View projects <Icon name="arrow" />
+            </a>
+            <a href="/Noura_Mohamed_Resume.pdf" className="btn btn-ghost" target="_blank" rel="noopener noreferrer">
+              <Icon name="download" /> Download CV
+            </a>
           </motion.div>
-
-          <motion.div className="col-md-7 order-md-2 order-1"
-            initial={{ opacity: 0, x: 60 }} animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.9, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}>
-            <div className="hero-eyebrow mb-3">
-              <span className="material-symbols-outlined align-middle me-1" style={{ fontSize: 16 }}>spark</span>
-              Creative Web Developer
-            </div>
-
-            <motion.h1 className="hero-name mb-4"
-              initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}>
-              Noura Mohamed
-            </motion.h1>
-
-            <motion.div className="mb-4"
-              initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.45, ease: [0.16, 1, 0.3, 1] }}>
-              <h2 className="hero-subtitle" style={{ marginBottom: 8 }}>
-                <span style={{ color: 'var(--primary)' }}>{displayText}</span>
-                <span className="typing-cursor">|</span>
-              </h2>
-              <p style={{ color: 'var(--on-muted)', fontSize: 15, lineHeight: 1.8, maxWidth: 500 }}>
-                I build fast, scalable and modern web applications using React and Laravel.
-              </p>
-            </motion.div>
-
-            <motion.div className="hero-badge mt-4 mb-5"
-              initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}>
-              <div style={{ width: 32, height: 1.5, background: 'var(--primary-dim)' }} />
-              <span className="label-tag text-primary-gold">By Noura Mohamed — Zagazig, EG</span>
-            </motion.div>
-
-            <motion.div className="d-flex gap-3 flex-wrap mt-4"
-              initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.75, ease: [0.16, 1, 0.3, 1] }}>
-              <a href="#projects" className="btn-hire text-decoration-none">View Work</a>
-              <a href="#contact" className="text-decoration-none d-flex align-items-center gap-2"
-                style={{ color: 'var(--on-muted)', fontSize: 14, fontWeight: 500 }}>
-                <span className="material-symbols-outlined" style={{ fontSize: 18, color: 'var(--primary)' }}>mail</span> Get in touch
-              </a>
-            </motion.div>
+          <motion.div className="socials" {...item(0.64)}>
+            <a href="https://github.com/NouraMohamed7" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><Icon name="github" size={20} /></a>
+            <a href="https://www.linkedin.com/in/noura-mohamed-22o/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><Icon name="linkedin" size={20} /></a>
+            <a href="mailto:noramohamedibrahim19@gmail.com" aria-label="Email"><Icon name="mail" size={20} /></a>
           </motion.div>
         </div>
+        <motion.div
+          className="hero-photo"
+          initial={reduce ? false : { opacity: 0, scale: 0.92, rotate: -2 }}
+          animate={{ opacity: 1, scale: 1, rotate: 0 }}
+          transition={{ duration: 1, delay: 0.2, ease }}
+        >
+          <motion.div className="photo-ring" animate={reduce ? undefined : { rotate: 360 }} transition={{ duration: 40, repeat: Infinity, ease: 'linear' }} aria-hidden="true" />
+          <motion.div className="photo-frame" animate={reduce ? undefined : { y: [0, -10, 0] }} transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}>
+            <img src={mee} alt="Noura Mohamed" width="460" height="628" />
+          </motion.div>
+          <motion.div className="chip chip-a" animate={reduce ? undefined : { y: [0, -8, 0] }} transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}>React.js</motion.div>
+          <motion.div className="chip chip-b" animate={reduce ? undefined : { y: [0, 8, 0] }} transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}>Laravel</motion.div>
+        </motion.div>
       </div>
-
-      <motion.div className="scroll-cue"
-        initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-        transition={{ delay: 1.5, duration: 0.6 }}>
-        <span className="material-symbols-outlined">keyboard_arrow_down</span>
-        <p>scroll</p>
-      </motion.div>
-    </header>
+    </section>
   )
 }

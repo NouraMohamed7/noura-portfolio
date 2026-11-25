@@ -1,110 +1,66 @@
-import AnimatedSection from './AnimatedSection'
+import { motion } from 'framer-motion'
+import Reveal from './Reveal'
 
-const experiences = [
+const items = [
   {
-    num: '01',
     date: '2024',
-    title: 'Backend Trainee @ NTI',
-    desc: 'Specializing in server-side logic, database management, and building secure, scalable back-end architectures using PHP and Laravel.',
+    title: 'Backend Trainee',
+    org: 'NTI',
+    desc: 'Trained in PHP, Laravel and MySQL. Built the CleanCity backend as my graduation project, with REST APIs, Sanctum auth and role-based access.',
   },
   {
-    num: '02',
     date: '2024',
-    title: 'Frontend Intern @ Bravo',
-    desc: 'Translating complex designs into pixel-perfect, responsive interfaces using React and modern CSS frameworks.',
+    title: 'Frontend Intern',
+    org: 'Bravo',
+    desc: 'Built responsive React interfaces from design files.',
   },
   {
-    num: '03',
     date: '2024',
-    title: 'API Testing Intern @ Zagazig',
-    desc: 'Ensuring data integrity and performance through rigorous endpoint testing and documentation for university systems.',
+    title: 'API Testing Intern',
+    org: 'Zagazig University',
+    desc: 'Tested API endpoints and wrote documentation for university systems.',
   },
+  {
+    date: 'Class of 2026',
+    title: 'B.Sc. Information Systems',
+    org: 'Zagazig University, Faculty of Computer and Information',
+    desc: 'Graduation project: Exclusive supplier dashboard, where I led the frontend.',
+  },
+]
+
+const awards = [
+  { title: 'Deep Dive Frontend', badge: '1st place', desc: 'Awarded first place for advanced React and UI work.' },
 ]
 
 export default function Experience() {
   return (
-    <section id="experience" className="section-pad bg-surface-lo">
-      <div className="container-xl">
-        <div className="row g-5">
-          <div className="col-lg-7">
-            <AnimatedSection>
-              <div className="section-label">
-                <span className="material-symbols-outlined">work_history</span>
-                <span className="label-tag text-primary-gold">Experience</span>
-              </div>
-              <h2 className="section-title mb-5">Career Timeline</h2>
-            </AnimatedSection>
-
-            {experiences.map((exp, i) => (
-              <AnimatedSection key={exp.num} delay={i * 0.1}>
-                <div className="exp-item">
-                  <span className="label-tag text-faint d-block mb-2">
-                    {exp.num} / {exp.date}
-                  </span>
-                  <h3 className="exp-title mb-2">{exp.title}</h3>
-                  <p style={{ color: 'var(--on-muted)', fontSize: 15 }}>
-                    {exp.desc}
-                  </p>
-                </div>
-              </AnimatedSection>
-            ))}
-          </div>
-
-          <div className="col-lg-5 d-flex align-items-center">
-            <AnimatedSection direction="left" duration={0.8} delay={0.15}>
-              <div className="position-relative w-100">
-                <div
-                  style={{
-                    padding: 3,
-                    background: 'var(--primary-dim)',
-                    clipPath:
-                      'polygon(8% 0, 92% 0, 100% 8%, 100% 92%, 92% 100%, 8% 100%, 0 92%, 0 8%)',
-                  }}
-                >
-                  <img
-                    src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800"
-                     alt="Collaborative coding"
-                    style={{
-                      width: '100%',
-                      aspectRatio: 1,
-                      objectFit: 'cover',
-                      filter: 'grayscale(1)',
-                      transition: 'filter .7s',
-                      clipPath:
-                        'polygon(8% 0, 92% 0, 100% 8%, 100% 92%, 92% 100%, 8% 100%, 0 92%, 0 8%)',
-                      display: 'block',
-                    }}
-                    onMouseEnter={(e) => (e.currentTarget.style.filter = 'grayscale(0)')}
-                    onMouseLeave={(e) => (e.currentTarget.style.filter = 'grayscale(1)')}
-                  />
-                </div>
-                <div
-                  style={{
-                    position: 'absolute',
-                    bottom: -16,
-                    left: -12,
-                    background: 'var(--bg)',
-                    padding: '14px 20px',
-                    border: '1px solid rgba(78,69,58,.3)',
-                    clipPath:
-                      'polygon(6% 0, 94% 0, 100% 6%, 100% 94%, 94% 100%, 6% 100%, 0 94%, 0 6%)',
-                  }}
-                >
-                  <span
-                    style={{
-                      fontFamily: 'var(--font-display)',
-                      color: 'var(--primary)',
-                      fontSize: 15,
-                      fontStyle: 'italic',
-                    }}
-                  >
-                    Crafted with Purpose
-                  </span>
-                </div>
-              </div>
-            </AnimatedSection>
-          </div>
+    <section id="experience" className="section section-alt">
+      <div className="container">
+        <Reveal>
+          <p className="kicker">Experience</p>
+          <h2>Training, internships and education</h2>
+        </Reveal>
+        <div className="timeline">
+          <motion.span className="timeline-line" initial={{ scaleY: 0 }} whileInView={{ scaleY: 1 }} viewport={{ once: true, amount: 0.1 }} transition={{ duration: 1.4, ease: 'easeOut' }} aria-hidden="true" />
+          {items.map((it, i) => (
+            <Reveal key={it.title} delay={i * 0.08} className="tl-item">
+              <span className="tl-dot" aria-hidden="true" />
+              <span className="tl-date">{it.date}</span>
+              <h3>{it.title}</h3>
+              <p className="tl-org">{it.org}</p>
+              <p>{it.desc}</p>
+            </Reveal>
+          ))}
         </div>
+        <Reveal>
+          <div className="award">
+            <span className="badge">{awards[0].badge}</span>
+            <div>
+              <h3>{awards[0].title}</h3>
+              <p>{awards[0].desc}</p>
+            </div>
+          </div>
+        </Reveal>
       </div>
     </section>
   )

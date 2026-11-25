@@ -1,62 +1,29 @@
 import { useEffect, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
+import Icon from './Icon'
 
 export default function BackToTop() {
   const [visible, setVisible] = useState(false)
-
   useEffect(() => {
-    const onScroll = () => setVisible(window.scrollY > 400)
-    window.addEventListener('scroll', onScroll)
+    const onScroll = () => setVisible(window.scrollY > 600)
     onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
-
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
-
   return (
     <AnimatePresence>
       {visible && (
-        <motion.div
-          className="back-to-top-arrow"
-          onClick={scrollToTop}
-          role="button"
+        <motion.button
+          className="back-to-top"
           aria-label="Back to top"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.3 }}
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.8 }}
+          whileHover={{ y: -3 }}
         >
-          <motion.svg
-            width="34"
-            height="46"
-            viewBox="0 0 34 46"
-            fill="none"
-            animate={{ y: [0, -8, 0] }}
-            transition={{
-              duration: 1.6,
-              repeat: Infinity,
-              ease: 'easeInOut',
-            }}
-          >
-            {/* عصاية السهم */}
-            <line
-              x1="17" y1="44" x2="17" y2="8"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-            />
-            {/* راس السهم */}
-            <path
-              d="M5 18L17 4L29 18"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </motion.svg>
-        </motion.div>
+          <Icon name="up" />
+        </motion.button>
       )}
     </AnimatePresence>
   )

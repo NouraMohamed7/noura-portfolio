@@ -1,120 +1,35 @@
 import { useState } from 'react'
-import AnimatedSection from './AnimatedSection'
-import { motion, AnimatePresence } from 'framer-motion'
+import Reveal from './Reveal'
+import Icon from './Icon'
 
-const contacts = [
-  {
-    icon: 'mail',
-    label: 'Email',
-    value: 'noramohamedibrahim19@gmail.com',
-    href: 'mailto:noramohamedibrahim19@gmail.com',
-    copyable: true,
-  },
-  {
-    icon: 'call',
-    label: 'Phone',
-    value: '+20 106 494 3625',
-    href: 'tel:+201064943625',
-  },
-  {
-    icon: 'link',
-    label: 'GitHub',
-    value: 'NouraMohamed7',
-    href: 'https://github.com/NouraMohamed7',
-  },
-]
+const EMAIL = 'noramohamedibrahim19@gmail.com'
 
 export default function Contact() {
-  const [toast, setToast] = useState(false)
-
-  const copyEmail = (email) => {
-    navigator.clipboard.writeText(email)
-    setToast(true)
-    setTimeout(() => setToast(false), 2000)
+  const [copied, setCopied] = useState(false)
+  const copy = async () => {
+    try { await navigator.clipboard.writeText(EMAIL) } catch (e) {}
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
   }
-
   return (
-    <section id="contact" className="section-pad bg-surface-lo">
-      <AnimatePresence>
-        {toast && (
-          <motion.div
-            initial={{ opacity: 0, y: -20, x: '-50%' }}
-            animate={{ opacity: 1, y: 0, x: '-50%' }}
-            exit={{ opacity: 0, y: -20, x: '-50%' }}
-            style={{
-              position: 'fixed',
-              top: 24,
-              left: '50%',
-              zIndex: 9999,
-              background: 'var(--primary)',
-              color: '#432c03',
-              padding: '10px 24px',
-              borderRadius: 4,
-              fontWeight: 600,
-              fontSize: 13,
-              letterSpacing: '.05em',
-            }}
-          >
-            Copied to clipboard!
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <div className="container-xl">
-        <div className="row g-5 align-items-center">
-          <div className="col-lg-6">
-            <AnimatedSection direction="right" duration={0.8}>
-              <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(36px,6vw,60px)', color: 'var(--primary)', lineHeight: 1.1, marginBottom: 48 }}>
-                Let's Work<br />Together
-              </h2>
-            </AnimatedSection>
-
-            <div className="d-flex flex-column gap-4">
-              {contacts.map((c, i) => (
-                <AnimatedSection key={c.label} delay={i * 0.1}>
-                  <div className="d-flex align-items-center gap-4">
-                    <a href={c.href} target={c.href.startsWith('http') ? '_blank' : undefined} rel={c.href.startsWith('http') ? 'noopener' : undefined} className="contact-link">
-                      <div className="contact-icon">
-                        <span className="material-symbols-outlined">{c.icon}</span>
-                      </div>
-                      <div>
-                        <p className="contact-label">{c.label}</p>
-                        <p className="contact-value">{c.value}</p>
-                      </div>
-                    </a>
-                    {c.copyable && (
-                      <button
-                        onClick={() => copyEmail(c.value)}
-                        className="btn-hire"
-                        style={{ padding: '4px 12px', fontSize: 11 }}
-                      >
-                        Copy
-                      </button>
-                    )}
-                  </div>
-                </AnimatedSection>
-              ))}
-            </div>
+    <section id="contact" className="section">
+      <div className="container">
+        <Reveal className="contact-box">
+          <p className="kicker">Contact</p>
+          <h2>Let's work together</h2>
+          <p className="lead">Interested in working together or have a question? Email is the quickest way to reach me.</p>
+          <div className="contact-actions">
+            <a className="btn btn-primary" href={`mailto:${EMAIL}`}><Icon name="mail" /> {EMAIL}</a>
+            <button className="btn btn-ghost" onClick={copy} aria-live="polite">
+              <Icon name={copied ? 'check' : 'copy'} /> {copied ? 'Copied' : 'Copy email'}
+            </button>
           </div>
-
-          <div className="col-lg-6 d-flex justify-content-center">
-            <AnimatedSection direction="left" duration={0.9} delay={0.1}>
-              <div className="position-relative">
-                <div className="dot-grid position-absolute" style={{ inset: -32, zIndex: 0, pointerEvents: 'none' }} />
-                <div className="phone-mockup" style={{ position: 'relative', zIndex: 1 }}>
-                  <div className="phone-notch"><div className="phone-notch-pill" /></div>
-                  <div className="phone-inner">
-                    <h4 style={{ fontFamily: 'var(--font-display)', color: 'var(--primary)', fontSize: 18, marginBottom: 22 }}>Send a Message</h4>
-                    <div className="phone-field"><p className="phone-field-label">Your Name</p></div>
-                    <div className="phone-field"><p className="phone-field-label">Your Email</p></div>
-                    <div className="phone-field" style={{ paddingBottom: 22 }}><p className="phone-field-label">Message</p></div>
-                    <button className="phone-send">Send Message</button>
-                  </div>
-                </div>
-              </div>
-            </AnimatedSection>
+          <div className="contact-links">
+            <a href="https://www.linkedin.com/in/noura-mohamed-22o/" target="_blank" rel="noopener noreferrer"><Icon name="linkedin" /> LinkedIn</a>
+            <a href="https://github.com/NouraMohamed7" target="_blank" rel="noopener noreferrer"><Icon name="github" /> GitHub</a>
+            <a href="/Noura_Mohamed_Resume.pdf" target="_blank" rel="noopener noreferrer"><Icon name="download" /> CV</a>
           </div>
-        </div>
+        </Reveal>
       </div>
     </section>
   )

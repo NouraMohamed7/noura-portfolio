@@ -1,106 +1,86 @@
-import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { useEffect, useState } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
+import Icon from './Icon'
 
-const navLinks = [
-  { label: 'About', href: '#about' },
-  { label: 'Experience', href: '#experience' },
-  { label: 'Work', href: '#projects' },
-  { label: 'Skills', href: '#skills' },
-  { label: 'Contact', href: '#contact' },
+const links = [
+  { label: 'About', id: 'about' },
+  { label: 'Experience', id: 'experience' },
+  { label: 'Projects', id: 'projects' },
+  { label: 'Skills', id: 'skills' },
+  { label: 'Contact', id: 'contact' },
 ]
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
-  const [menuOpen, setMenuOpen] = useState(false)
+  const [open, setOpen] = useState(false)
+  const [active, setActive] = useState('')
+  const [theme, setTheme] = useState(() => document.documentElement.dataset.theme || 'dark')
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 40)
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    return () => window.removeEventListener('scroll', handleScroll)
+    document.documentElement.dataset.theme = theme
+    try { localStorage.setItem('theme', theme) } catch (e) {}
+  }, [theme])
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 20)
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  const handleClick = (e, href) => {
+  useEffect(() => {
+    const obs = new IntersectionObserver(
+      (entries) => entries.forEach((e) => e.isIntersecting && setActive(e.target.id)),
+      { rootMargin: '-45% 0px -50% 0px' }
+    )
+    links.forEach((l) => {
+      const el = document.getElementById(l.id)
+      if (el) obs.observe(el)
+    })
+    return () => obs.disconnect()
+  }, [])
+
+  const go = (e, id) => {
     e.preventDefault()
-    setMenuOpen(false)
-    const target = document.querySelector(href)
-    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    setOpen(false)
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
   return (
-    <nav
-      className="navbar-custom fixed-top py-3"
-      style={{
-        background: scrolled ? 'rgba(23,19,15,.97)' : 'rgba(23,19,15,.92)',
-      }}
-    >
-      <div className="container-xl d-flex justify-content-between align-items-center">
-        <a href="#" className="brand-logo">NOURA.DEV</a>
-
-        <button
-          className="navbar-toggler border-0 d-md-none"
-          onClick={() => setMenuOpen(!menuOpen)}
-          aria-label="Toggle navigation"
-        >
-          <span className="material-symbols-outlined text-primary-gold">
-            {menuOpen ? 'close' : 'menu'}
-          </span>
-        </button>
-
-        <div className="d-none d-md-flex align-items-center gap-4">
-          {navLinks.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              onClick={(e) => handleClick(e, link.href)}
-              className="nav-link-custom"
-            >
-              {link.label}
+    <header className={`nav ${scrolled ? 'nav-scrolled' : ''}`}>
+      <div className="container nav-inner">
+        <a href="#top" className="brand" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }) }}>
+          Noura<span>.</span>
+        </a>
+        <nav className="nav-links" aria-label="Main">
+          {links.map((l) => (
+            <a key={l.id} href={`#${l.id}`} onClick={(e) => go(e, l.id)} className={active === l.id ? 'is-active' : ''}>
+              {l.label}
+              {active === l.id && <motion.span layoutId="nav-underline" className="nav-underline" />}
             </a>
           ))}
-          <a
-            href="#contact"
-            onClick={(e) => handleClick(e, '#contact')}
-            className="btn-hire ms-3"
-          >
-            Hire Me
-          </a>
+        </nav>
+        <div className="nav-actions">
+          <button className="icon-btn" aria-label="Toggle dark and light theme" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>
+            <Icon name={theme === 'dark' ? 'sun' : 'moon'} />
+          </button>
+          <a href="#contact" onClick={(e) => go(e, 'contact')} className="btn btn-primary nav-cta">Contact me</a>
+          <button className="icon-btn nav-burger" aria-label="Menu" onClick={() => setOpen(!open)}>
+            <Icon name={open ? 'close' : 'menu'} />
+          </button>
         </div>
-
-        <AnimatePresence>
-          {menuOpen && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.3 }}
-              className="d-md-none w-100 overflow-hidden"
-            >
-              <div className="d-flex flex-column gap-3 mt-3 pb-3">
-                {navLinks.map((link, i) => (
-                  <motion.a
-                    key={link.href}
-                    href={link.href}
-                    onClick={(e) => handleClick(e, link.href)}
-                    className="nav-link-custom"
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * 0.05 }}
-                  >
-                    {link.label}
-                  </motion.a>
-                ))}
-                <a
-                  href="#contact"
-                  onClick={(e) => handleClick(e, '#contact')}
-                  className="btn-hire text-center"
-                >
-                  Hire Me
-                </a>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </div>
-    </nav>
+      <AnimatePresence>
+        {open && (
+          <motion.div className="nav-mobile" initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}>
+            <div className="container nav-mobile-inner">
+              {links.map((l) => (
+                <a key={l.id} href={`#${l.id}`} onClick={(e) => go(e, l.id)}>{l.label}</a>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </header>
   )
 }
